@@ -9,7 +9,6 @@ import (
 	"github.com/jenkins-x/jx-helpers/pkg/cmdrunner"
 	"github.com/jenkins-x/jx-helpers/pkg/gitclient"
 	"github.com/jenkins-x/jx-helpers/pkg/gitclient/cli"
-	"github.com/jenkins-x/jx-helpers/pkg/stringhelpers"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -183,31 +182,6 @@ func (o *Options) Setup() error {
 				return errors.Wrapf(err, "failed to remove path %s", path)
 			}
 		}
-	}
-	return o.checkoutOrCreateBranch()
-}
-
-func (o *Options) checkoutOrCreateBranch() error {
-	dir := o.Dir
-	g := o.GitClient
-	branches, err := gitclient.RemoteBranches(g, dir)
-	if err != nil {
-		return errors.Wrapf(err, "failed to find remote branches in dir %s", dir)
-	}
-
-	log := logrus.WithField("Branch", o.Branch)
-	if stringhelpers.StringArrayIndex(branches, o.Branch) < 0 {
-		log.Infof("creating branch")
-		_, err = g.Command(dir, "checkout", "-b", o.Branch)
-		if err != nil {
-			return errors.Wrapf(err, "failed to create branch %s", o.Branch)
-		}
-		return nil
-	}
-
-	_, err = g.Command(dir, "checkout", o.Branch)
-	if err != nil {
-		return errors.Wrapf(err, "failed to checkout branch %s", o.Branch)
 	}
 	return nil
 }

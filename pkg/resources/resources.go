@@ -31,11 +31,7 @@ type Options struct {
 var (
 	resources = []schema.GroupVersionResource{
 		// core resources
-		{Group: "", Version: "v1", Resource: "configmaps"},
 		{Group: "", Version: "v1", Resource: "pods"},
-
-		// external secrets
-		{Group: "kubernetes-client.io", Version: "v1", Resource: "externalsecrets"},
 
 		// jx resources
 		{Group: "jenkins.io", Version: "v1", Resource: "pipelineactivities"},

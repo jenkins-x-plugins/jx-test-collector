@@ -3,12 +3,14 @@ package tailer
 import (
 	"context"
 	"io/ioutil"
+	"path/filepath"
 	"regexp"
 	"text/template"
 	"time"
 
 	"github.com/jenkins-x/jx-helpers/pkg/kube"
 	"github.com/jenkins-x/jx-test-collector/pkg/gitstore"
+	"github.com/jenkins-x/jx-test-collector/pkg/web"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
@@ -18,11 +20,17 @@ import (
 
 // Options the configuration options for the tailer
 type Options struct {
+	// Web REST API
+	Web web.Options
+
 	// GitStore takes care of storing files in git
 	GitStore gitstore.Options
 
 	// Dir is the work directory. If not specified a temporary directory is created on startup.
 	Dir string `env:"WORK_DIR"`
+
+	// LogsPath the path within Dir where we store pod logs
+	LogsPath string `env:"LOG_PATH,default=logs"`
 
 	// Namespace the namespace polled. Defaults to all of them
 	Namespace string `env:"NAMESPACE"`
@@ -56,19 +64,17 @@ func (o *Options) Run() error {
 		return errors.Wrap(err, "invalid options")
 	}
 
-	err = o.Poll()
+	err = o.GitStore.Setup()
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "failed to setup git store")
 	}
-	return nil
-}
 
-// Poll polls the available repositories
-func (o *Options) Poll() error {
-	err := o.ValidateOptions()
-	if err != nil {
-		return errors.Wrap(err, "invalid options")
-	}
+	go func() {
+		err := o.Web.Run()
+		if err != nil {
+			logrus.WithError(err).Fatal("failed to serve http")
+		}
+	}()
 
 	namespace := o.Namespace
 
@@ -84,6 +90,8 @@ func (o *Options) Poll() error {
 
 	tails := make(map[string]*Tail)
 
+	podLogDir := filepath.Join(o.Dir, o.LogsPath)
+
 	go func() {
 		for p := range added {
 			id := p.GetID()
@@ -91,7 +99,7 @@ func (o *Options) Poll() error {
 				continue
 			}
 
-			tail := NewTail(o.Dir, p.Namespace, p.Pod, p.Container, o.Template, &TailOptions{
+			tail := NewTail(podLogDir, p.Namespace, p.Pod, p.Container, o.Template, &TailOptions{
 				Timestamps:   o.Timestamps,
 				SinceSeconds: int64(o.Since.Seconds()),
 				Exclude:      o.Exclude,
@@ -123,6 +131,8 @@ func (o *Options) Poll() error {
 
 // ValidateOptions validates the options and lazily creates any resources required
 func (o *Options) ValidateOptions() error {
+	o.Web.Sync = o.GitStore.Sync
+
 	var err error
 	o.KubeClient, err = kube.LazyCreateKubeClient(o.KubeClient)
 	if err != nil {

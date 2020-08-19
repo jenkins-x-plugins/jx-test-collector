@@ -10,6 +10,7 @@ import (
 	"github.com/jenkins-x/jx-helpers/pkg/cmdrunner/fakerunner"
 	"github.com/jenkins-x/jx-helpers/pkg/files"
 	"github.com/jenkins-x/jx-test-collector/pkg/gitstore"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -51,6 +52,10 @@ func TestGitStore(t *testing.T) {
 	err = o.ValidateOptions(kubeClient, tmpDir)
 	require.NoError(t, err, "failed to run ValidateOptions()")
 
+	cloneURL, err := o.GitCloneURL()
+	require.NoError(t, err, "failed to create git clone URL")
+	assert.Equal(t, "https://myuser:mypwd@github.com/jenkins-x/jenkins-x-versions-test.git", cloneURL, "git clone URL")
+
 	err = o.Setup()
 	require.NoError(t, err, "failed to run Setup()")
 
@@ -63,6 +68,8 @@ func TestGitStore(t *testing.T) {
 	err = ioutil.WriteFile(outFile, []byte("Hello\nWorld!\n"), files.DefaultFileWritePermissions)
 	require.NoError(t, err, "failed to save file %s", outFile)
 
-	err = o.Sync()
+	text, err := o.Sync()
 	require.NoError(t, err, "failed to run Sync()")
+
+	t.Logf("Sync returned: %s\n", text)
 }

@@ -213,32 +213,33 @@ func (o *Options) checkoutOrCreateBranch() error {
 }
 
 // Sync performs a synchronisation of any local files to the underlying storage engine
-func (o *Options) Sync() error {
+func (o *Options) Sync() (string, error) {
 	dir := o.Dir
 	g := o.GitClient
+	answer := ""
 	_, err := g.Command(dir, "add", "*")
 	if err != nil {
-		return errors.Wrapf(err, "failed to add files to git")
+		return answer, errors.Wrapf(err, "failed to add files to git")
 	}
 
 	changes, err := gitclient.HasChanges(g, dir)
 	if err != nil {
-		return errors.Wrapf(err, "failed to check if there are changes in git")
+		return answer, errors.Wrapf(err, "failed to check if there are changes in git")
 	}
 
 	if !changes {
-		return nil
+		return "no changes", nil
 	}
 
 	_, err = g.Command(dir, "commit", "-a", "-m", "chore: latest logs")
 	if err != nil {
-		return errors.Wrapf(err, "failed to commit latest logs to dir %s", dir)
+		return "", errors.Wrapf(err, "failed to commit latest logs to dir %s", dir)
 	}
 	_, err = g.Command(dir, "push", "origin", o.Branch)
 	if err != nil {
-		return errors.Wrapf(err, "failed to push changes to git")
+		return "", errors.Wrapf(err, "failed to push changes to git")
 	}
-	return nil
+	return "sync completed", nil
 }
 
 // GitCloneURL returns the git clone URL

@@ -6,6 +6,7 @@ require (
 	github.com/Azure/go-autorest/autorest v0.9.8 // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.8.3 // indirect
 	github.com/fatih/color v1.9.0
+	github.com/ghodss/yaml v1.0.0
 	github.com/golang/protobuf v1.3.5 // indirect
 	github.com/imdario/mergo v0.3.10 // indirect
 	github.com/jenkins-x/jx-helpers v1.0.44
@@ -19,7 +20,7 @@ require (
 	k8s.io/api v0.17.9
 	k8s.io/apimachinery v0.17.9
 	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
-	sigs.k8s.io/yaml v1.2.0 // indirect
+	sigs.k8s.io/yaml v1.2.0
 )
 
 replace (

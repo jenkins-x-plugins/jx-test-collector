@@ -49,8 +49,8 @@ func TestGitStore(t *testing.T) {
 	}
 	o.CommandRunner = runner.Run
 
-	err = o.ValidateOptions(kubeClient, tmpDir)
-	require.NoError(t, err, "failed to run ValidateOptions()")
+	err = o.Validate(kubeClient, tmpDir)
+	require.NoError(t, err, "failed to run Validate()")
 
 	cloneURL, err := o.GitCloneURL()
 	require.NoError(t, err, "failed to create git clone URL")

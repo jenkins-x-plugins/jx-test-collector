@@ -72,8 +72,8 @@ type Options struct {
 	SecretName string `env:"SECRET_NAME,default=jx-boot"`
 }
 
-// ValidateOptions validates the options and lazily creates any resources required
-func (o *Options) ValidateOptions(kubeClient kubernetes.Interface, dir string) error {
+// Validate validates the options and lazily creates any resources required
+func (o *Options) Validate(kubeClient kubernetes.Interface, dir string) error {
 	o.Dir = dir
 	if o.GitClient == nil {
 		o.GitClient = cli.NewCLIClient(o.GitBinary, o.CommandRunner)

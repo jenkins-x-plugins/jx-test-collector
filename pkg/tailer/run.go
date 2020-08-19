@@ -10,6 +10,7 @@ import (
 
 	"github.com/jenkins-x/jx-helpers/pkg/kube"
 	"github.com/jenkins-x/jx-test-collector/pkg/gitstore"
+	"github.com/jenkins-x/jx-test-collector/pkg/resources"
 	"github.com/jenkins-x/jx-test-collector/pkg/web"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -23,14 +24,20 @@ type Options struct {
 	// Web REST API
 	Web web.Options
 
+	// Resources for dumping kubernetes resources
+	Resources resources.Options
+
 	// GitStore takes care of storing files in git
 	GitStore gitstore.Options
 
 	// Dir is the work directory. If not specified a temporary directory is created on startup.
 	Dir string `env:"WORK_DIR"`
 
-	// LogsPath the path within Dir where we store pod logs
-	LogsPath string `env:"LOG_PATH,default=logs"`
+	// LogPath the path within Dir where we store pod logs
+	LogPath string `env:"LOG_PATH,default=logs"`
+
+	// ResourcePath the path within Dir where we store resources
+	ResourcePath string `env:"RESOURCE_PATH,default=resources"`
 
 	// Namespace the namespace polled. Defaults to all of them
 	Namespace string `env:"NAMESPACE"`
@@ -90,7 +97,7 @@ func (o *Options) Run() error {
 
 	tails := make(map[string]*Tail)
 
-	podLogDir := filepath.Join(o.Dir, o.LogsPath)
+	podLogDir := filepath.Join(o.Dir, o.LogPath)
 
 	go func() {
 		for p := range added {
@@ -131,7 +138,13 @@ func (o *Options) Run() error {
 
 // ValidateOptions validates the options and lazily creates any resources required
 func (o *Options) ValidateOptions() error {
-	o.Web.Sync = o.GitStore.Sync
+	o.Web.Sync = func() (string, error) {
+		err := o.Resources.Run()
+		if err != nil {
+			return "", errors.Wrapf(err, "failed to get kubernetes resources")
+		}
+		return o.GitStore.Sync()
+	}
 
 	var err error
 	o.KubeClient, err = kube.LazyCreateKubeClient(o.KubeClient)
@@ -152,12 +165,14 @@ func (o *Options) ValidateOptions() error {
 	}
 	logrus.Infof("writing files to dir: %s", o.Dir)
 
-	err = o.GitStore.ValidateOptions(o.KubeClient, o.Dir)
+	err = o.GitStore.Validate(o.KubeClient, o.Dir)
 	if err != nil {
 		return errors.Wrapf(err, "failed to validate GitStore")
 	}
+
+	err = o.Resources.Validate(filepath.Join(o.Dir, o.ResourcePath))
 	if err != nil {
-		return errors.Wrapf(err, "failed to setup storage in dir %s", o.Dir)
+		return errors.Wrapf(err, "failed to setup resource fetcher")
 	}
 	return nil
 }

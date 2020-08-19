@@ -8,10 +8,7 @@ require (
 	github.com/fatih/color v1.9.0
 	github.com/golang/protobuf v1.3.5 // indirect
 	github.com/imdario/mergo v0.3.10 // indirect
-	github.com/jenkins-x/jx-api v0.0.17 // indirect
-	github.com/jenkins-x/jx-helpers v1.0.34
-	github.com/jenkins-x/jx-kube-client v0.0.8
-	github.com/jenkins-x/jx-logging v0.0.11
+	github.com/jenkins-x/jx-helpers v1.0.44
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/pkg/errors v0.9.1

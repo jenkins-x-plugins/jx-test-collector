@@ -20,7 +20,6 @@ package tailer
 import (
 	"bufio"
 	"context"
-	"fmt"
 	"hash/fnv"
 	"os"
 	"path/filepath"
@@ -29,7 +28,6 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/jenkins-x/jx-helpers/pkg/files"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/typed/core/v1"
@@ -109,21 +107,12 @@ func (t *Tail) Start(ctx context.Context, i v1.PodInterface) {
 	t.podColor, t.containerColor = determineColor(t.PodName)
 
 	go func() {
-		g := color.New(color.FgHiGreen, color.Bold).SprintFunc()
-		p := t.podColor.SprintFunc()
-		c := t.containerColor.SprintFunc()
-		if t.Options.Namespace {
-			fmt.Fprintf(os.Stderr, "%s %s %s › %s\n", g("+"), p(t.Namespace), p(t.PodName), c(t.ContainerName))
-		} else {
-			fmt.Fprintf(os.Stderr, "%s %s › %s\n", g("+"), p(t.PodName), c(t.ContainerName))
-		}
-
 		req := i.GetLogs(t.PodName, &corev1.PodLogOptions{
 			Follow:     true,
 			Timestamps: t.Options.Timestamps,
 			Container:  t.ContainerName,
+			TailLines:  t.Options.TailLines,
 			//SinceSeconds: &t.Options.SinceSeconds,
-			TailLines: t.Options.TailLines,
 		})
 
 		fileName := filepath.Join(t.Dir, t.ContainerName+".log")
@@ -139,7 +128,7 @@ func (t *Tail) Start(ctx context.Context, i v1.PodInterface) {
 
 		stream, err := req.Stream()
 		if err != nil {
-			fmt.Println(errors.Wrapf(err, "Error opening stream to %s/%s: %s\n", t.Namespace, t.PodName, t.ContainerName))
+			t.log.WithError(err).Warnf("Error opening stream to %s/%s: %s\n", t.Namespace, t.PodName, t.ContainerName)
 			return
 		}
 		defer stream.Close()
@@ -193,13 +182,6 @@ func (t *Tail) Start(ctx context.Context, i v1.PodInterface) {
 
 // Close stops tailing
 func (t *Tail) Close() {
-	r := color.New(color.FgHiRed, color.Bold).SprintFunc()
-	p := t.podColor.SprintFunc()
-	if t.Options.Namespace {
-		fmt.Fprintf(os.Stderr, "%s %s %s\n", r("-"), p(t.Namespace), p(t.PodName))
-	} else {
-		fmt.Fprintf(os.Stderr, "%s %s\n", r("-"), p(t.PodName))
-	}
 	close(t.closed)
 }
 
@@ -207,23 +189,4 @@ func (t *Tail) Close() {
 func (t *Tail) Print(writer *bufio.Writer, msg string) {
 	writer.WriteString(msg)
 	writer.Flush()
-}
-
-// Log is the object which will be used together with the template to generate
-// the output.
-type Log struct {
-	// Message is the log message itself
-	Message string `json:"message"`
-
-	// Namespace of the pod
-	Namespace string `json:"namespace"`
-
-	// PodName of the pod
-	PodName string `json:"podName"`
-
-	// ContainerName of the container
-	ContainerName string `json:"containerName"`
-
-	PodColor       *color.Color `json:"-"`
-	ContainerColor *color.Color `json:"-"`
 }

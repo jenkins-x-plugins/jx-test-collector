@@ -1,0 +1,43 @@
+rbac:
+  # if enabled lets install a ClusterRole and ClusterRoleBinding otherwise use Role / RoleBinding
+  cluster: true
+
+  # if strict mode lets not assume cluster-admin
+  strict: false
+
+image:
+  repository: gcr.io/jenkinsxio/jx-test-collector
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  name: "jx-test-collector"
+  # a map of annotations to add to the ServiceAccount
+  annotations: {}
+
+# define environment variables here as a map of key: value
+env:
+  # how frequently to poll git
+  POLL_DURATION: "20s"
+
+# define environment variables from here as a map of key: value
+envFrom: []
+
+# a map of annotations to add to the pod
+podAnnotations: {}
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 256Mi
+  requests:
+    cpu: 80m
+    memory: 128Mi
+
+terminationGracePeriodSeconds: 30

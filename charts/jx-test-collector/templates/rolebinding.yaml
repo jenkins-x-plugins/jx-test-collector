@@ -1,0 +1,14 @@
+{{- if not .Values.rbac.cluster }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name:  {{ template "jx-test-collector.name" . }}
+subjects:
+  - kind: ServiceAccount
+    name: "{{ .Values.serviceAccount.name | default "jx-test-collector" }}"
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  name:  {{ template "jx-test-collector.name" . }}
+  apiGroup: rbac.authorization.k8s.io
+{{- end -}}

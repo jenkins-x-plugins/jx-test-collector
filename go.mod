@@ -7,9 +7,10 @@ require (
 	github.com/Azure/go-autorest/autorest/adal v0.8.3 // indirect
 	github.com/fatih/color v1.9.0
 	github.com/ghodss/yaml v1.0.0
-	github.com/golang/protobuf v1.3.5 // indirect
 	github.com/imdario/mergo v0.3.10 // indirect
 	github.com/jenkins-x/jx-helpers v1.0.44
+	github.com/jenkins-x/jx-logging v0.0.11
+	github.com/jenkins-x/jx-secret v0.0.90
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/pkg/errors v0.9.1
@@ -24,6 +25,10 @@ require (
 )
 
 replace (
+	github.com/Azure/go-autorest => github.com/Azure/go-autorest v13.3.1+incompatible
+
+	github.com/jenkins-x/jx-secret => /workspace/go/src/github.com/jenkins-x/jx-secret
+
 	k8s.io/api => k8s.io/api v0.17.2
 	k8s.io/apimachinery => k8s.io/apimachinery v0.17.2
 	k8s.io/client-go => k8s.io/client-go v0.16.5

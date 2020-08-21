@@ -10,6 +10,7 @@ import (
 
 	"github.com/jenkins-x/jx-helpers/pkg/kube"
 	"github.com/jenkins-x/jx-test-collector/pkg/gitstore"
+	"github.com/jenkins-x/jx-test-collector/pkg/masker"
 	"github.com/jenkins-x/jx-test-collector/pkg/resources"
 	"github.com/jenkins-x/jx-test-collector/pkg/web"
 	"github.com/pkg/errors"
@@ -54,6 +55,9 @@ type Options struct {
 	// KubeClient is used to lazy create the repo client and launcher
 	KubeClient kubernetes.Interface
 
+	// Masker for masking secrets in logs
+	Masker *masker.Client
+
 	Timestamps    bool
 	Exclude       []*regexp.Regexp
 	Include       []*regexp.Regexp
@@ -90,6 +94,11 @@ func (o *Options) Run() error {
 	ctx := context.Background()
 	kubeClient := o.KubeClient
 
+	o.Masker, err = masker.NewMasker(kubeClient, namespace)
+	if err != nil {
+		return errors.Wrapf(err, "failed to create masker")
+	}
+
 	added, removed, err := o.Watch(ctx, kubeClient.CoreV1().Pods(namespace), o.LabelSelector)
 	if err != nil {
 		return errors.Wrap(err, "failed to set up watch")
@@ -106,7 +115,7 @@ func (o *Options) Run() error {
 				continue
 			}
 
-			tail := NewTail(podLogDir, p.Namespace, p.Pod, p.Container, o.Template, &TailOptions{
+			tail := NewTail(o.Masker, podLogDir, p.Namespace, p.Pod, p.Container, o.Template, &TailOptions{
 				Timestamps:   o.Timestamps,
 				SinceSeconds: int64(o.Since.Seconds()),
 				Exclude:      o.Exclude,

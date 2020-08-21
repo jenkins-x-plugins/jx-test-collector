@@ -28,6 +28,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/jenkins-x/jx-helpers/pkg/files"
+	"github.com/jenkins-x/jx-test-collector/pkg/masker"
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/typed/core/v1"
@@ -46,6 +47,7 @@ type Tail struct {
 	containerColor *color.Color
 	tmpl           *template.Template
 	log            *logrus.Entry
+	masker         *masker.Client
 }
 
 type TailOptions struct {
@@ -58,7 +60,7 @@ type TailOptions struct {
 }
 
 // NewTail returns a new tail for a Kubernetes container inside a pod
-func NewTail(dir, namespace, podName, containerName string, tmpl *template.Template, options *TailOptions) *Tail {
+func NewTail(masker *masker.Client, dir, namespace, podName, containerName string, tmpl *template.Template, options *TailOptions) *Tail {
 	log := logrus.WithFields(
 		map[string]interface{}{
 			"Namespace": namespace,
@@ -79,6 +81,7 @@ func NewTail(dir, namespace, podName, containerName string, tmpl *template.Templ
 		PodName:       podName,
 		ContainerName: containerName,
 		Options:       options,
+		masker:        masker,
 		closed:        make(chan struct{}),
 		tmpl:          tmpl,
 	}
@@ -187,6 +190,7 @@ func (t *Tail) Close() {
 
 // Print prints a line to the file
 func (t *Tail) Print(writer *bufio.Writer, msg string) {
-	writer.WriteString(msg)
+	masked := t.masker.Mask(msg)
+	writer.WriteString(masked)
 	writer.Flush()
 }

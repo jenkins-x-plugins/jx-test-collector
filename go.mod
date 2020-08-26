@@ -8,7 +8,7 @@ require (
 	github.com/fatih/color v1.9.0
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
 	github.com/imdario/mergo v0.3.10 // indirect
-	github.com/jenkins-x/jx-gitops v0.0.228
+	github.com/jenkins-x/jx-gitops v0.0.230
 	github.com/jenkins-x/jx-helpers v1.0.45
 	github.com/jenkins-x/jx-logging v0.0.11
 	github.com/jenkins-x/jx-secret v0.0.92

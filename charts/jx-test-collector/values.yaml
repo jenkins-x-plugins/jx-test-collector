@@ -26,6 +26,9 @@ env:
   # how frequently to poll git
   POLL_DURATION: "20s"
 
+  # default home directory where the git config/credentials are stored
+  HOME: "/home"
+
 # define environment variables from here as a map of key: value
 envFrom: []
 

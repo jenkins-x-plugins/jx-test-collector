@@ -115,7 +115,7 @@ func (o *Options) Run() error {
 				continue
 			}
 
-			tail := NewTail(o.Masker, podLogDir, p.Namespace, p.Pod, p.Container, o.Template, &TailOptions{
+			tail := NewTail(o.Masker, podLogDir, p.Namespace, p.Pod, p.Container, p.App, o.Template, &TailOptions{
 				Timestamps:   o.Timestamps,
 				SinceSeconds: int64(o.Since.Seconds()),
 				Exclude:      o.Exclude,

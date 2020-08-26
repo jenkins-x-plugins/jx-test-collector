@@ -60,7 +60,7 @@ type TailOptions struct {
 }
 
 // NewTail returns a new tail for a Kubernetes container inside a pod
-func NewTail(masker *masker.Client, dir, namespace, podName, containerName string, tmpl *template.Template, options *TailOptions) *Tail {
+func NewTail(masker *masker.Client, dir, namespace, podName, containerName, app string, tmpl *template.Template, options *TailOptions) *Tail {
 	log := logrus.WithFields(
 		map[string]interface{}{
 			"Namespace": namespace,
@@ -68,7 +68,11 @@ func NewTail(masker *masker.Client, dir, namespace, podName, containerName strin
 			"Container": containerName,
 		})
 
-	podDir := filepath.Join(dir, namespace, podName)
+	nsDir := filepath.Join(dir, namespace)
+	if app != "" {
+		nsDir = filepath.Join(nsDir, app)
+	}
+	podDir := filepath.Join(nsDir, podName)
 	err := os.MkdirAll(podDir, files.DefaultDirWritePermissions)
 	if err != nil {
 		log.WithError(err).Errorf("failed to create dir: %s", podDir)

@@ -35,6 +35,7 @@ type Target struct {
 	Namespace string
 	Pod       string
 	Container string
+	App       string
 }
 
 // GetID returns the ID of the object
@@ -83,10 +84,15 @@ func (o *Options) Watch(ctx context.Context, i v1.PodInterface, labelSelector la
 							continue
 						}
 
+						app := ""
+						if pod.Labels != nil {
+							app = pod.Labels["app"]
+						}
 						added <- &Target{
 							Namespace: pod.Namespace,
 							Pod:       pod.Name,
 							Container: c.Name,
+							App:       app,
 						}
 					}
 				case watch.Deleted:

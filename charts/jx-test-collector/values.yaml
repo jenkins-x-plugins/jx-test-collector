@@ -7,7 +7,7 @@ rbac:
 
 image:
   repository: gcr.io/jenkinsxio/jx-test-collector
-  tag: 0.0.17
+  tag: 0.0.18
   pullPolicy: IfNotPresent
 
 replicaCount: 1

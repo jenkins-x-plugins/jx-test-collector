@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/jenkins-x/jx-gitops/pkg/cmd/git/setup"
 	"github.com/jenkins-x/jx-helpers/pkg/cmdrunner"
 	"github.com/jenkins-x/jx-helpers/pkg/gitclient"
 	"github.com/jenkins-x/jx-helpers/pkg/gitclient/cli"
@@ -45,6 +46,9 @@ type Options struct {
 	//
 	// see: https://jenkins-x.io/docs/v3/guides/operator/
 	Username string `env:"GIT_USERNAME"`
+
+	// Email the git user email address to perform commits
+	Email string `env:"GIT_EMAIL,default=jenkins-x@googlegroups.com`
 
 	// Token the git token to clone and commit.
 	//
@@ -121,6 +125,18 @@ func (o *Options) Validate(kubeClient kubernetes.Interface, dir string) error {
 			}
 		}
 	}
+
+	_, so := setup.NewCmdGitSetup()
+	so.Dir = dir
+	so.UserEmail = o.Email
+	so.UserName = o.Username
+	so.CommandRunner = o.CommandRunner
+
+	err := so.Run()
+	if err != nil {
+		return errors.Wrapf(err, "failed to setup git client")
+	}
+
 	logrus.WithFields(map[string]interface{}{
 		"URL":      o.URL,
 		"Username": o.Username,

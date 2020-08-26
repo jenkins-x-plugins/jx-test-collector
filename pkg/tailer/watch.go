@@ -20,6 +20,7 @@ package tailer
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 
 	"github.com/pkg/errors"
 
@@ -87,6 +88,23 @@ func (o *Options) Watch(ctx context.Context, i v1.PodInterface, labelSelector la
 						app := ""
 						if pod.Labels != nil {
 							app = pod.Labels["app"]
+							if app == "" {
+								app = pod.Labels["app.kubernetes.io/managed-by"]
+							}
+							if app == "tekton-pipelines" {
+								owner := pod.Labels["owner"]
+								repository := pod.Labels["repository"]
+								branch := pod.Labels["branch"]
+								if owner != "" {
+									app = filepath.Join(app, owner)
+								}
+								if repository != "" {
+									app = filepath.Join(app, repository)
+								}
+								if branch != "" {
+									app = filepath.Join(app, branch)
+								}
+							}
 						}
 						added <- &Target{
 							Namespace: pod.Namespace,

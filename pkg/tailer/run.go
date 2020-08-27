@@ -93,7 +93,7 @@ func (o *Options) Run() error {
 		for {
 			select {
 			case <-ticker.C:
-				output, err := o.GitStore.Sync()
+				output, err := o.DoSync()
 				l := logrus.WithField("sync", "git")
 				if err != nil {
 					l = l.WithError(err)
@@ -168,11 +168,7 @@ func (o *Options) Run() error {
 // ValidateOptions validates the options and lazily creates any resources required
 func (o *Options) ValidateOptions() error {
 	o.Web.Sync = func() (string, error) {
-		err := o.Resources.Run()
-		if err != nil {
-			return "", errors.Wrapf(err, "failed to get kubernetes resources")
-		}
-		return o.GitStore.Sync()
+		return o.DoSync()
 	}
 
 	var err error
@@ -204,6 +200,16 @@ func (o *Options) ValidateOptions() error {
 		return errors.Wrapf(err, "failed to setup resource fetcher")
 	}
 	return nil
+}
+
+// DoSync dumps all of the kubernetes resources and syncs the resources
+// and logs to the git store
+func (o *Options) DoSync() (string, error) {
+	err := o.Resources.Run()
+	if err != nil {
+		return "", errors.Wrapf(err, "failed to get kubernetes resources")
+	}
+	return o.GitStore.Sync()
 }
 
 // MatchPod for filtering on the pod

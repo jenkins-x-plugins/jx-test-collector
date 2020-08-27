@@ -43,8 +43,8 @@ type Options struct {
 	// Namespace the namespace polled. Defaults to all of them
 	Namespace string `env:"NAMESPACE"`
 
-	// PollDuration duration between polls
-	PollDuration time.Duration `env:"POLL_DURATION"`
+	// SyncDuration duration between syncs
+	SyncDuration time.Duration `env:"SYNC_DURATION"`
 
 	// NoLoop disable the polling loop so that a single poll is performed only
 	NoLoop bool `env:"NO_LOOP"`
@@ -84,6 +84,26 @@ func (o *Options) Run() error {
 		err := o.Web.Run()
 		if err != nil {
 			logrus.WithError(err).Fatal("failed to serve http")
+		}
+	}()
+
+	ticker := time.NewTicker(o.SyncDuration)
+	quit := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				output, err := o.GitStore.Sync()
+				l := logrus.WithField("sync", "git")
+				if err != nil {
+					l = l.WithError(err)
+				}
+				l.Info(output)
+
+			case <-quit:
+				ticker.Stop()
+				return
+			}
 		}
 	}()
 
@@ -163,8 +183,8 @@ func (o *Options) ValidateOptions() error {
 	if o.LabelSelector == nil {
 		o.LabelSelector = labels.NewSelector()
 	}
-	if o.PollDuration.Milliseconds() == int64(0) {
-		o.PollDuration = time.Second * 30
+	if o.SyncDuration.Milliseconds() == int64(0) {
+		o.SyncDuration = time.Minute * 5
 	}
 	if o.Dir == "" {
 		o.Dir, err = ioutil.TempDir("", "jx-test-collector-")

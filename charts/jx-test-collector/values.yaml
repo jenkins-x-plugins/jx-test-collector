@@ -23,8 +23,8 @@ serviceAccount:
 
 # define environment variables here as a map of key: value
 env:
-  # how frequently to poll git
-  POLL_DURATION: "20s"
+  # how frequently to synchronise files with git
+  SYNC_DURATION: "5m"
 
   # default home directory where the git config/credentials are stored
   HOME: "/home"

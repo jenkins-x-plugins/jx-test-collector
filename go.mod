@@ -9,7 +9,8 @@ require (
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
 	github.com/googleapis/gnostic v0.4.2 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
-	github.com/jenkins-x/jx-gitops v0.0.282
+	github.com/jenkins-x/jx-api v0.0.18 // indirect
+	github.com/jenkins-x/jx-gitops v0.0.288
 	github.com/jenkins-x/jx-helpers v1.0.58
 	github.com/jenkins-x/jx-logging v0.0.11
 	github.com/jenkins-x/jx-secret v0.0.136

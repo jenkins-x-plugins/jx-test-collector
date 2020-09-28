@@ -95,9 +95,16 @@ func (o *Options) Validate(kubeClient kubernetes.Interface, dir string) error {
 		secret, err := kubeClient.CoreV1().Secrets(ns).Get(name, metav1.GetOptions{})
 		if err != nil {
 			if apierrors.IsNotFound(err) {
+				if ns != "jx-git-operator" {
+					secret, err = kubeClient.CoreV1().Secrets("jx-git-operator").Get(name, metav1.GetOptions{})
+					if err != nil {
+						return errors.Errorf("no Secret %s in namespace %s", name, ns)
+					}
+				}
 				return errors.Errorf("no Secret %s in namespace %s", name, ns)
+			} else {
+				return errors.Errorf("failed to load Secret %s in namespace %s", name, ns)
 			}
-			return errors.Errorf("failed to load Secret %s in namespace %s", name, ns)
 		}
 		data := secret.Data
 		if data != nil {

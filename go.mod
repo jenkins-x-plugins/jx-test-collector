@@ -7,13 +7,13 @@ require (
 	github.com/Azure/go-autorest/autorest/adal v0.8.3 // indirect
 	github.com/fatih/color v1.9.0
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
+	github.com/google/uuid v1.1.2 // indirect
 	github.com/googleapis/gnostic v0.4.2 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
-	github.com/jenkins-x/jx-api v0.0.18 // indirect
-	github.com/jenkins-x/jx-gitops v0.0.288
-	github.com/jenkins-x/jx-helpers v1.0.58
+	github.com/jenkins-x/jx-gitops v0.0.340
+	github.com/jenkins-x/jx-helpers v1.0.75
 	github.com/jenkins-x/jx-logging v0.0.11
-	github.com/jenkins-x/jx-secret v0.0.136
+	github.com/jenkins-x/jx-secret v0.0.144
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/pkg/errors v0.9.1
@@ -22,8 +22,8 @@ require (
 	github.com/stretchr/testify v1.6.1
 	golang.org/x/text v0.3.3 // indirect
 	google.golang.org/appengine v1.6.6 // indirect
-	k8s.io/api v0.18.8
-	k8s.io/apimachinery v0.18.8
+	k8s.io/api v0.18.9
+	k8s.io/apimachinery v0.18.9
 	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
 	sigs.k8s.io/yaml v1.2.0
 )

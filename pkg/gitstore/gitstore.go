@@ -1,15 +1,16 @@
 package gitstore
 
 import (
+	"context"
 	"io/ioutil"
 	"net/url"
 	"os"
 	"path/filepath"
 
 	"github.com/jenkins-x/jx-gitops/pkg/cmd/git/setup"
-	"github.com/jenkins-x/jx-helpers/pkg/cmdrunner"
-	"github.com/jenkins-x/jx-helpers/pkg/gitclient"
-	"github.com/jenkins-x/jx-helpers/pkg/gitclient/cli"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/cmdrunner"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/cli"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -84,6 +85,7 @@ func (o *Options) Validate(kubeClient kubernetes.Interface, dir string) error {
 	if o.Branch == "" {
 		o.Branch = "gh-pages"
 	}
+	ctx := context.Background()
 	if o.URL == "" || o.Username == "" || o.Token == "" {
 		name := o.SecretName
 		ns := o.JXNamespace
@@ -92,13 +94,14 @@ func (o *Options) Validate(kubeClient kubernetes.Interface, dir string) error {
 		}
 
 		// lets get the secret
-		secret, err := kubeClient.CoreV1().Secrets(ns).Get(name, metav1.GetOptions{})
+		secret, err := kubeClient.CoreV1().Secrets(ns).Get(ctx, name, metav1.GetOptions{})
 		if err != nil {
 			if apierrors.IsNotFound(err) {
-				if ns != "jx-git-operator" {
-					secret, err = kubeClient.CoreV1().Secrets("jx-git-operator").Get(name, metav1.GetOptions{})
+				operatorNS := "jx-git-operator"
+				if ns != operatorNS {
+					secret, err = kubeClient.CoreV1().Secrets(operatorNS).Get(ctx, name, metav1.GetOptions{})
 					if err != nil {
-						return errors.Errorf("no Secret %s in namespace %s", name, ns)
+						return errors.Errorf("no Secret %s in namespace %s or %s", name, ns, operatorNS)
 					}
 				}
 				return errors.Errorf("no Secret %s in namespace %s", name, ns)

@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/jenkins-x/jx-helpers/pkg/cmdrunner"
-	"github.com/jenkins-x/jx-helpers/pkg/cmdrunner/fakerunner"
-	"github.com/jenkins-x/jx-helpers/pkg/files"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/cmdrunner"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/cmdrunner/fakerunner"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/files"
 	"github.com/jenkins-x/jx-test-collector/pkg/gitstore"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -23,6 +23,7 @@ func TestGitStore(t *testing.T) {
 	t.Logf("running in dir %s", tmpDir)
 
 	o := &gitstore.Options{}
+	o.SecretName = "jx-boot"
 	ns := "jx"
 	kubeClient := fake.NewSimpleClientset(
 		&corev1.Secret{

@@ -1,12 +1,13 @@
 package resources
 
 import (
+	"context"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	"github.com/jenkins-x/jx-helpers/pkg/files"
-	"github.com/jenkins-x/jx-helpers/pkg/kube"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/files"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/kube"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -65,13 +66,14 @@ func (o *Options) Run() error {
 	dynClient := o.DynamicClient
 	ns := o.Namespace
 
+	ctx := context.Background()
 	for _, r := range resources {
 		log := logrus.WithFields(map[string]interface{}{
 			"Namespace": ns,
 			"Group":     r.Group,
 			"Resource":  r.Resource,
 		})
-		resources, err := dynClient.Resource(r).Namespace(ns).List(metav1.ListOptions{})
+		resources, err := dynClient.Resource(r).Namespace(ns).List(ctx, metav1.ListOptions{})
 		if err != nil && !apierrors.IsNotFound(err) {
 			// probably RBAC related
 			log.WithError(err).Error("cannot list resources")

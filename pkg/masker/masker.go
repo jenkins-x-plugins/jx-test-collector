@@ -1,11 +1,12 @@
 package masker
 
 import (
+	"context"
 	"strings"
 
-	"github.com/jenkins-x/jx-helpers/pkg/stringhelpers"
-	"github.com/jenkins-x/jx-helpers/pkg/termcolor"
-	"github.com/jenkins-x/jx-logging/pkg/log"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/stringhelpers"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/termcolor"
+	"github.com/jenkins-x/jx-logging/v3/pkg/log"
 	"github.com/jenkins-x/jx-secret/pkg/schemas"
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
@@ -51,7 +52,8 @@ type Client struct {
 // NewMasker creates a new Client loading secrets from the given namespace
 func NewMasker(kubeClient kubernetes.Interface, ns string) (*Client, error) {
 	masker := &Client{}
-	resourceList, err := kubeClient.CoreV1().Secrets(ns).List(metav1.ListOptions{})
+	ctx := context.Background()
+	resourceList, err := kubeClient.CoreV1().Secrets(ns).List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return masker, err
 	}
@@ -64,7 +66,8 @@ func NewMasker(kubeClient kubernetes.Interface, ns string) (*Client, error) {
 
 // LoadSecrets loads the secrets into the log masker
 func (m *Client) LoadSecrets(kubeClient kubernetes.Interface, ns string) error {
-	resourceList, err := kubeClient.CoreV1().Secrets(ns).List(metav1.ListOptions{})
+	ctx := context.Background()
+	resourceList, err := kubeClient.CoreV1().Secrets(ns).List(ctx, metav1.ListOptions{})
 	if err != nil {
 		return err
 	}

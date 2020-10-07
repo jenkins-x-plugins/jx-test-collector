@@ -27,7 +27,7 @@ import (
 	"text/template"
 
 	"github.com/fatih/color"
-	"github.com/jenkins-x/jx-helpers/pkg/files"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/files"
 	"github.com/jenkins-x/jx-test-collector/pkg/masker"
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
@@ -133,7 +133,8 @@ func (t *Tail) Start(ctx context.Context, i v1.PodInterface) {
 		writer := bufio.NewWriter(file)
 		defer writer.Flush()
 
-		stream, err := req.Stream()
+		ctx := context.Background()
+		stream, err := req.Stream(ctx)
 		if err != nil {
 			t.log.WithError(err).Warnf("Error opening stream to %s/%s: %s\n", t.Namespace, t.PodName, t.ContainerName)
 			return

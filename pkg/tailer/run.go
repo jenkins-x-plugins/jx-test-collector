@@ -8,7 +8,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/jenkins-x/jx-helpers/pkg/kube"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/kube"
 	"github.com/jenkins-x/jx-test-collector/pkg/gitstore"
 	"github.com/jenkins-x/jx-test-collector/pkg/masker"
 	"github.com/jenkins-x/jx-test-collector/pkg/resources"

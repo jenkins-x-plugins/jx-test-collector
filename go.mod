@@ -7,14 +7,12 @@ require (
 	github.com/Azure/go-autorest/autorest/adal v0.8.3 // indirect
 	github.com/fatih/color v1.9.0
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
-	github.com/go-logr/logr v0.2.1 // indirect
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/googleapis/gnostic v0.4.2 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
-	github.com/jenkins-x/jx-api/v3 v3.0.1 // indirect
-	github.com/jenkins-x/jx-gitops v0.0.380
-	github.com/jenkins-x/jx-helpers/v3 v3.0.5
-	github.com/jenkins-x/jx-secret v0.0.162
+	github.com/jenkins-x/jx-gitops v0.0.382
+	github.com/jenkins-x/jx-helpers/v3 v3.0.6
+	github.com/jenkins-x/jx-secret v0.0.170
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/sethvargo/go-envconfig v0.1.2

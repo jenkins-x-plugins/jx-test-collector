@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/jenkins-x/jx-helpers/v3/pkg/kube"
+	"github.com/jenkins-x/jx-secret/pkg/masker"
 	"github.com/jenkins-x/jx-test-collector/pkg/gitstore"
-	"github.com/jenkins-x/jx-test-collector/pkg/masker"
 	"github.com/jenkins-x/jx-test-collector/pkg/resources"
 	"github.com/jenkins-x/jx-test-collector/pkg/web"
 	"github.com/pkg/errors"
@@ -42,6 +42,9 @@ type Options struct {
 
 	// Namespace the namespace polled. Defaults to all of them
 	Namespace string `env:"NAMESPACE"`
+
+	// OperatorNamespace the namespace for the git operator if different to the current namespace
+	OperatorNamespace string `env:"GIT_OPERATOR_NAMESPACE,default=jx-git-operator"`
 
 	// SyncDuration duration between syncs
 	SyncDuration time.Duration `env:"SYNC_DURATION"`
@@ -114,7 +117,7 @@ func (o *Options) Run() error {
 	ctx := context.Background()
 	kubeClient := o.KubeClient
 
-	o.Masker, err = masker.NewMasker(kubeClient, namespace)
+	o.Masker, err = masker.NewMasker(kubeClient, namespace, o.OperatorNamespace)
 	if err != nil {
 		return errors.Wrapf(err, "failed to create masker")
 	}

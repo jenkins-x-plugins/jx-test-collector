@@ -103,8 +103,9 @@ func (o *Options) Validate(kubeClient kubernetes.Interface, dir string) error {
 					if err != nil {
 						return errors.Errorf("no Secret %s in namespace %s or %s", name, ns, operatorNS)
 					}
+				} else {
+					return errors.Errorf("no Secret %s in namespace %s", name, ns)
 				}
-				return errors.Errorf("no Secret %s in namespace %s", name, ns)
 			} else {
 				return errors.Errorf("failed to load Secret %s in namespace %s", name, ns)
 			}

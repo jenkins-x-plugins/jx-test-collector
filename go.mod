@@ -13,9 +13,9 @@ require (
 	github.com/google/uuid v1.1.5 // indirect
 	github.com/googleapis/gnostic v0.4.2 // indirect
 	github.com/jenkins-x/jx-gitops v0.0.524
-	github.com/jenkins-x/jx-helpers/v3 v3.0.60
+	github.com/jenkins-x/jx-helpers/v3 v3.0.61
 	github.com/jenkins-x/jx-logging/v3 v3.0.3 // indirect
-	github.com/jenkins-x/jx-secret v0.0.206
+	github.com/jenkins-x/jx-secret v0.0.207
 	github.com/pkg/errors v0.9.1
 	github.com/sethvargo/go-envconfig v0.1.2
 	github.com/sirupsen/logrus v1.7.0

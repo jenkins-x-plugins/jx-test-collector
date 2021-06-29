@@ -1,10 +1,11 @@
 package resources
 
 import (
-	"context"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/options"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/jenkins-x/jx-helpers/v3/pkg/files"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/kube"
@@ -19,6 +20,8 @@ import (
 
 // Options the options for the resources operation
 type Options struct {
+	options.BaseOptions
+
 	// Dir the directory to dump resources to
 	Dir string
 
@@ -30,7 +33,8 @@ type Options struct {
 }
 
 var (
-	resources = []schema.GroupVersionResource{
+	// ResourceGVRs the resources
+	ResourceGVRs = []schema.GroupVersionResource{
 		// core resources
 		{Group: "", Version: "v1", Resource: "pods"},
 
@@ -43,7 +47,16 @@ var (
 		{Group: "tekton.dev", Version: "v1alpha1", Resource: "taskruns"},
 		{Group: "tekton.dev", Version: "v1alpha1", Resource: "tasks"},
 	}
+
+	// ResourceMap the map for fake clients
+	ResourceMap = map[schema.GroupVersionResource]string{}
 )
+
+func init() {
+	for _, r := range ResourceGVRs {
+		ResourceMap[r] = strings.Title(r.Resource + "List")
+	}
+}
 
 // Validate validates the options
 func (o *Options) Validate(dir string) error {
@@ -66,8 +79,8 @@ func (o *Options) Run() error {
 	dynClient := o.DynamicClient
 	ns := o.Namespace
 
-	ctx := context.Background()
-	for _, r := range resources {
+	ctx := o.GetContext()
+	for _, r := range ResourceGVRs {
 		log := logrus.WithFields(map[string]interface{}{
 			"Namespace": ns,
 			"Group":     r.Group,

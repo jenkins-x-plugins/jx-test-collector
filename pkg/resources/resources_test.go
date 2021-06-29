@@ -1,6 +1,7 @@
 package resources_test
 
 import (
+	"context"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
@@ -27,7 +28,8 @@ func TestResources(t *testing.T) {
 	scheme := runtime.NewScheme()
 	corev1.AddToScheme(scheme)
 
-	o.DynamicClient = fake.NewSimpleDynamicClient(scheme, testResources...)
+	o.Ctx = context.TODO()
+	o.DynamicClient = fake.NewSimpleDynamicClientWithCustomListKinds(scheme, resources.ResourceMap, testResources...)
 
 	err = o.Run()
 	require.NoError(t, err, "failed to run Run()")

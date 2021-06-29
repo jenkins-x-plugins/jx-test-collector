@@ -28,7 +28,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/files"
-	"github.com/jenkins-x/jx-secret/pkg/masker"
+	"github.com/jenkins-x-plugins/jx-secret/pkg/masker"
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/typed/core/v1"

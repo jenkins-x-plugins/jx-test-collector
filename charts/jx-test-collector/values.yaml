@@ -6,7 +6,7 @@ rbac:
   strict: false
 
 image:
-  repository: gcr.io/jenkinsxio/jx-test-collector
+  repository: ghcr.io/jenkins-x/jx-test-collector
   tag: "latest"
   pullPolicy: IfNotPresent
 
